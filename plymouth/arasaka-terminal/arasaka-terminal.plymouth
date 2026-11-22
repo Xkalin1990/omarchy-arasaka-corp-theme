@@ -1,0 +1,12 @@
+[Plymouth Theme]
+Name=Arasaka Terminal
+Description=Cyberpunk 2077 Arasaka Corporation security terminal bootsplash for boot and reset.
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/arasaka-terminal
+ScriptFile=/usr/share/plymouth/themes/arasaka-terminal/arasaka-terminal.script
+ConsoleLogBackgroundColor=0x110d0e
+ConsoleLogTextColor=0xe50000
+MonospaceFont=JetBrainsMono Nerd Font 16
+Font=JetBrainsMono Nerd Font 16

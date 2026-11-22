@@ -1,0 +1,411 @@
+# Arasaka Terminal Plymouth Theme (Boot & Reset / Shutdown)
+
+# Deep Arasaka charcoal background (#110d0e)
+Window.SetBackgroundTopColor(0.067, 0.051, 0.055);
+Window.SetBackgroundBottomColor(0.067, 0.051, 0.055);
+
+# Palette
+global.red_r = 0.898;
+global.red_g = 0.000;
+global.red_b = 0.000;
+
+global.dim_red_r = 0.650;
+global.dim_red_g = 0.080;
+global.dim_red_b = 0.080;
+
+# Mode detection ("boot", "resume", "shutdown", "reboot", etc.)
+global.mode = Plymouth.GetMode();
+global.is_reboot = (global.mode == "reboot");
+global.is_shutdown = (global.mode == "shutdown" || global.mode == "reboot");
+
+# State
+global.frame = 0;
+global.glitch_frames = 18;
+global.glitch_done = 0;
+global.glitch_seed = 1337;
+global.password_shown = 0;
+global.current_bullets = 0;
+global.booting_after_unlock = 0;
+global.layout_width = 0;
+global.layout_height = 0;
+
+#----------------------------------------- Static Assets --------------------------------
+
+red_px = Image("red_pixel.png");
+dim_red_px = Image("dim_red_pixel.png");
+box_bg_px = Image("box_bg_pixel.png");
+grey_px = Image("grey_pixel.png");
+
+left_bar_sprite = Sprite();
+ver_img = Image("version_vert.png");
+ver_sprite = Sprite(ver_img);
+
+corner_img = Image("arasaka_corner.png");
+corner_sprite = Sprite(corner_img);
+
+emblem_img = Image("arasaka_emblem.png");
+emblem_sprite = Sprite(emblem_img);
+
+wordmark_img = Image("arasaka_wordmark.png");
+wordmark_sprite = Sprite(wordmark_img);
+
+slashes_img = Image("slashes_bar.png");
+slashes_sprite = Sprite(slashes_img);
+
+if (global.is_shutdown == 1) {
+  net_img = Image("network_info_off.png");
+} else {
+  net_img = Image("network_info.png");
+}
+net_sprite = Sprite(net_img);
+
+#----------------------------------------- Login Box Chrome --------------------------------
+
+global.box_w = 480;
+global.box_h = 92;
+
+box_bg_sprite = Sprite();
+box_top_sprite = Sprite();
+box_bottom_sprite = Sprite();
+box_left_sprite = Sprite();
+box_right_sprite = Sprite();
+
+if (global.is_reboot == 1) {
+  header_text = "SYSTEM REBOOT";
+} else if (global.is_shutdown == 1) {
+  header_text = "SYSTEM SHUTDOWN";
+} else {
+  header_text = "SECURITY LOGIN";
+}
+
+header_img = Image.Text(header_text, global.red_r, global.red_g, global.red_b, 1, "JetBrainsMono Nerd Font Bold 15");
+header_sprite = Sprite(header_img);
+
+#----------------------------------------- Prompt, Password & Cursor --------------------------------
+
+if (global.is_reboot == 1) {
+  prefix_text = "REBOOTING SYSTEM...";
+} else if (global.is_shutdown == 1) {
+  prefix_text = "SHUTTING DOWN...";
+} else {
+  prefix_text = "UID_ ";
+}
+
+prefix_img = Image.Text(prefix_text, global.dim_red_r, global.dim_red_g, global.dim_red_b, 1, "JetBrainsMono Nerd Font 18");
+prefix_sprite = Sprite(prefix_img);
+
+stars_sprite = Sprite();
+stars_sprite.SetOpacity(0);
+
+granted_img = Image.Text("ACCESS GRANTED // BOOTING", global.red_r, global.red_g, global.red_b, 1, "JetBrainsMono Nerd Font 17");
+granted_sprite = Sprite(granted_img);
+granted_sprite.SetOpacity(0);
+
+status_sprite = Sprite();
+status_sprite.SetOpacity(0);
+
+cursor_sprite = Sprite(red_px.Scale(14, 26));
+cursor_sprite.SetOpacity(1);
+
+global.prompt_x = 0;
+global.prompt_y = 0;
+global.cursor_x = 0;
+global.cursor_y = 0;
+
+fun update_cursor(x, y) {
+  global.cursor_x = x;
+  global.cursor_y = y;
+  cursor_sprite.SetPosition(x, y, 30);
+}
+
+fun render_bullets(count) {
+  if (global.is_shutdown == 1 || global.booting_after_unlock == 1) return;
+
+  stars_str = "";
+  max_show = count;
+  if (max_show > 20) max_show = 20;
+  for (i = 0; i < max_show; i++) {
+    stars_str += "*";
+  }
+
+  if (max_show > 0) {
+    stars_img = Image.Text(stars_str, global.red_r, global.red_g, global.red_b, 1, "JetBrainsMono Nerd Font 18");
+    stars_sprite.SetImage(stars_img);
+    stars_sprite.SetOpacity(1);
+    stars_w = stars_img.GetWidth();
+  } else {
+    stars_sprite.SetOpacity(0);
+    stars_w = 0;
+  }
+
+  update_cursor(global.prompt_x + prefix_img.GetWidth() + stars_w + 2, global.prompt_y + 2);
+}
+
+fun layout() {
+  w = Window.GetWidth();
+  h = Window.GetHeight();
+  global.layout_width = w;
+  global.layout_height = h;
+
+  # Left full-height red bar
+  left_bar_sprite.SetImage(red_px.Scale(15, h));
+  left_bar_sprite.SetPosition(0, 0, 5);
+
+  # Bottom-left vertical OS version
+  ver_sprite.SetPosition(28, h - ver_img.GetHeight() - 28, 10);
+
+  # Bottom-right Arasaka corner badge
+  corner_sprite.SetPosition(w - corner_img.GetWidth() - 36, h - corner_img.GetHeight() - 28, 10);
+
+  # Center hero block (256 + 60 + 480 = 796 wide, ~340 tall)
+  hero_w = 796;
+  hero_h = 340;
+  hero_x = Math.Int((w - hero_w) / 2);
+  hero_y = Math.Int((h - hero_h) / 2);
+
+  emblem_sprite.SetPosition(hero_x + 3, hero_y, 10);
+  wordmark_sprite.SetPosition(hero_x, hero_y + 266, 10);
+
+  right_x = hero_x + 256 + 60;
+  header_sprite.SetPosition(right_x, hero_y + 32, 20);
+
+  box_y = hero_y + 68;
+  box_bg_sprite.SetImage(box_bg_px.Scale(global.box_w, global.box_h));
+  box_bg_sprite.SetPosition(right_x, box_y, 10);
+
+  box_top_sprite.SetImage(dim_red_px.Scale(global.box_w, 2));
+  box_top_sprite.SetPosition(right_x, box_y, 15);
+
+  box_bottom_sprite.SetImage(dim_red_px.Scale(global.box_w, 2));
+  box_bottom_sprite.SetPosition(right_x, box_y + global.box_h - 2, 15);
+
+  box_left_sprite.SetImage(dim_red_px.Scale(2, global.box_h));
+  box_left_sprite.SetPosition(right_x, box_y, 15);
+
+  box_right_sprite.SetImage(dim_red_px.Scale(2, global.box_h));
+  box_right_sprite.SetPosition(right_x + global.box_w - 2, box_y, 15);
+
+  global.prompt_x = right_x + 26;
+  global.prompt_y = box_y + Math.Int((global.box_h - prefix_img.GetHeight()) / 2);
+
+  prefix_sprite.SetPosition(global.prompt_x, global.prompt_y, 20);
+  stars_sprite.SetPosition(global.prompt_x + prefix_img.GetWidth(), global.prompt_y, 20);
+  granted_sprite.SetPosition(global.prompt_x, global.prompt_y, 20);
+
+  slashes_sprite.SetPosition(right_x, box_y + global.box_h + 22, 10);
+  net_sprite.SetPosition(right_x, box_y + global.box_h + 56, 10);
+  status_sprite.SetPosition(right_x, box_y + global.box_h + 118, 20);
+
+  if (global.booting_after_unlock == 1) {
+    update_cursor(global.prompt_x + granted_img.GetWidth() + 6, global.prompt_y + 2);
+  } else if (global.is_shutdown == 1) {
+    update_cursor(global.prompt_x + prefix_img.GetWidth() + 6, global.prompt_y + 2);
+  } else {
+    render_bullets(global.current_bullets);
+  }
+}
+
+#----------------------------------------- Boot Glitch Overlay --------------------------------
+
+global.glitch_bar_count = 12;
+glitch_bars = [];
+for (i = 0; i < global.glitch_bar_count; i++) {
+  glitch_bars[i] = Sprite();
+  glitch_bars[i].SetOpacity(0);
+}
+glitch_flash_sprite = Sprite();
+glitch_flash_sprite.SetOpacity(0);
+
+fun next_rand(max_val) {
+  global.glitch_seed = (global.glitch_seed * 75 + 74) % 65537;
+  if (global.glitch_seed < 0) global.glitch_seed = -global.glitch_seed;
+  if (max_val <= 0) return 0;
+  return Math.Int(global.glitch_seed) % max_val;
+}
+
+fun apply_glitch_frame() {
+  w = global.layout_width;
+  h = global.layout_height;
+  if (w <= 0 || h <= 0) return;
+
+  # Intensity decays over ~0.36s (18 frames at ~50fps)
+  if (global.frame < 6) {
+    amp = 24;
+  } else if (global.frame < 12) {
+    amp = 14;
+  } else {
+    amp = 6;
+  }
+
+  # Brief full-screen flash pulses
+  if (global.frame == 0) {
+    glitch_flash_sprite.SetImage(red_px.Scale(w, h));
+    glitch_flash_sprite.SetPosition(0, 0, 95);
+    glitch_flash_sprite.SetOpacity(0.16);
+  } else if (global.frame == 2) {
+    glitch_flash_sprite.SetImage(grey_px.Scale(w, h));
+    glitch_flash_sprite.SetPosition(0, 0, 95);
+    glitch_flash_sprite.SetOpacity(0.08);
+  } else if (global.frame == 5) {
+    glitch_flash_sprite.SetImage(red_px.Scale(w, h));
+    glitch_flash_sprite.SetPosition(0, 0, 95);
+    glitch_flash_sprite.SetOpacity(0.10);
+  } else {
+    glitch_flash_sprite.SetOpacity(0);
+  }
+
+  # Whole-screen horizontal tear bars & scanline slices
+  for (i = 0; i < global.glitch_bar_count; i++) {
+    if (i < 4) {
+      # Full-width thin scanline tears
+      bw = w;
+      bx = 0;
+      bh = 2 + next_rand(5);
+    } else {
+      # Partial horizontal glitch blocks
+      bw = Math.Int(w * 0.15) + next_rand(Math.Int(w * 0.55));
+      bx = next_rand(w - bw + 1);
+      bh = 4 + next_rand(22);
+    }
+    by = next_rand(h - bh + 1);
+    kind = next_rand(4);
+    if (kind == 0) {
+      glitch_bars[i].SetImage(red_px.Scale(bw, bh));
+      glitch_bars[i].SetOpacity(0.55);
+    } else if (kind == 1) {
+      glitch_bars[i].SetImage(dim_red_px.Scale(bw, bh));
+      glitch_bars[i].SetOpacity(0.45);
+    } else if (kind == 2) {
+      glitch_bars[i].SetImage(grey_px.Scale(bw, bh));
+      glitch_bars[i].SetOpacity(0.35);
+    } else {
+      glitch_bars[i].SetImage(box_bg_px.Scale(bw, bh));
+      glitch_bars[i].SetOpacity(0.85);
+    }
+    glitch_bars[i].SetPosition(bx, by, 85 + i);
+  }
+
+  # Jitter main UI elements around their layout positions
+  hero_w = 796;
+  hero_h = 340;
+  hero_x = Math.Int((w - hero_w) / 2);
+  hero_y = Math.Int((h - hero_h) / 2);
+  right_x = hero_x + 256 + 60;
+  box_y = hero_y + 68;
+
+  dx1 = next_rand(amp * 2 + 1) - amp;
+  dy1 = next_rand(7) - 3;
+  emblem_sprite.SetPosition(hero_x + 3 + dx1, hero_y + dy1, 10);
+
+  dx2 = next_rand(amp * 2 + 1) - amp;
+  wordmark_sprite.SetPosition(hero_x + dx2, hero_y + 266, 10);
+
+  dx3 = next_rand(amp * 2 + 1) - amp;
+  corner_sprite.SetPosition(w - corner_img.GetWidth() - 36 + dx3, h - corner_img.GetHeight() - 28, 10);
+
+  dx4 = next_rand(amp + 1) - Math.Int(amp / 2);
+  ver_sprite.SetPosition(28 + dx4, h - ver_img.GetHeight() - 28, 10);
+  left_bar_sprite.SetPosition(next_rand(5) - 2, 0, 5);
+
+  dx5 = next_rand(amp * 2 + 1) - amp;
+  header_sprite.SetPosition(right_x + dx5, hero_y + 32, 20);
+  box_bg_sprite.SetPosition(right_x + dx5, box_y, 10);
+  box_top_sprite.SetPosition(right_x + dx5, box_y, 15);
+  box_bottom_sprite.SetPosition(right_x + dx5, box_y + global.box_h - 2, 15);
+  box_left_sprite.SetPosition(right_x + dx5, box_y, 15);
+  box_right_sprite.SetPosition(right_x + global.box_w - 2 + dx5, box_y, 15);
+  prefix_sprite.SetPosition(global.prompt_x + dx5, global.prompt_y, 20);
+  slashes_sprite.SetPosition(right_x - dx5, box_y + global.box_h + 22, 10);
+  net_sprite.SetPosition(right_x + next_rand(amp + 1) - Math.Int(amp / 2), box_y + global.box_h + 56, 10);
+
+  # Brief signal dropout flickers
+  if (global.frame == 2) {
+    emblem_sprite.SetOpacity(0.25);
+  } else {
+    emblem_sprite.SetOpacity(1);
+  }
+  if (global.frame == 4) {
+    wordmark_sprite.SetOpacity(0.2);
+  } else {
+    wordmark_sprite.SetOpacity(1);
+  }
+  if (global.frame == 6) {
+    corner_sprite.SetOpacity(0.15);
+  } else {
+    corner_sprite.SetOpacity(1);
+  }
+}
+
+fun end_glitch() {
+  global.glitch_done = 1;
+  glitch_flash_sprite.SetOpacity(0);
+  for (i = 0; i < global.glitch_bar_count; i++) {
+    glitch_bars[i].SetOpacity(0);
+  }
+  emblem_sprite.SetOpacity(1);
+  wordmark_sprite.SetOpacity(1);
+  corner_sprite.SetOpacity(1);
+  layout();
+}
+
+layout();
+
+#----------------------------------------- Refresh Loop --------------------------------
+
+fun refresh_callback() {
+  if (Window.GetWidth() != global.layout_width || Window.GetHeight() != global.layout_height) {
+    layout();
+  }
+
+  if (global.frame < global.glitch_frames) {
+    apply_glitch_frame();
+  } else if (global.glitch_done == 0) {
+    end_glitch();
+  }
+
+  global.frame++;
+  if (Math.Int(global.frame / 24) % 2 == 0) {
+    cursor_sprite.SetOpacity(1);
+  } else {
+    cursor_sprite.SetOpacity(0);
+  }
+}
+
+Plymouth.SetRefreshFunction(refresh_callback);
+
+#----------------------------------------- Plymouth Callbacks --------------------------------
+
+fun display_password_callback(prompt, bullets) {
+  global.password_shown = 1;
+  global.booting_after_unlock = 0;
+  global.current_bullets = bullets;
+
+  prefix_sprite.SetOpacity(1);
+  granted_sprite.SetOpacity(0);
+  render_bullets(bullets);
+}
+
+fun display_normal_callback() {
+  if (global.password_shown == 1 && global.is_shutdown == 0) {
+    global.booting_after_unlock = 1;
+    prefix_sprite.SetOpacity(0);
+    stars_sprite.SetOpacity(0);
+    granted_sprite.SetOpacity(1);
+    update_cursor(global.prompt_x + granted_img.GetWidth() + 6, global.prompt_y + 2);
+  }
+}
+
+fun display_message_callback(text) {
+  msg_img = Image.Text(text, global.red_r, global.red_g, global.red_b, 1, "JetBrainsMono Nerd Font 13");
+  status_sprite.SetImage(msg_img);
+  status_sprite.SetOpacity(1);
+}
+
+fun hide_message_callback(text) {
+  status_sprite.SetOpacity(0);
+}
+
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
+Plymouth.SetDisplayNormalFunction(display_normal_callback);
+Plymouth.SetDisplayMessageFunction(display_message_callback);
+Plymouth.SetHideMessageFunction(hide_message_callback);
