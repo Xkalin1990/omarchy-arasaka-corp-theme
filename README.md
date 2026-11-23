@@ -28,6 +28,9 @@ Running the bundled installer installs up to four components (or you can install
 ### Clean Workspace
 ![Clean Workspace](screenshots/clean-workspace.png)
 
+### About System (Full Desktop Visible)
+![About System](screenshots/about-system.png)
+
 ### Bootsplash Screen (`SECURITY LOGIN`)
 ![Bootsplash Screen](screenshots/bootsplash.png)
 
