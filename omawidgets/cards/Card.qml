@@ -53,12 +53,14 @@ BorderSurface {
     + contentBottomInset
 
   readonly property real gap: contentColumn.children.length > 0
-    ? (compact ? Style.spacing.md : Style.spacing.lg) : 0
+    ? (compact ? Style.spacing.md : Style.spacing.lg) + (hudActive ? Style.space(6) : 0)
+    : 0
 
   ArasakaCardChrome {
     anchors.fill: parent
     visible: root.hudActive
     hudCode: root.hudCode
+    hideBadge: root.closable && root.hovered
     z: 0
   }
 
@@ -121,7 +123,7 @@ BorderSurface {
   Image {
     visible: root.hudActive && contentColumn.children.length > 0
     anchors.top: header.bottom
-    anchors.topMargin: Math.max(2, root.gap * 0.45)
+    anchors.topMargin: Math.max(4, Math.round(root.gap * 0.35))
     anchors.left: parent.left
     anchors.leftMargin: root.contentLeftInset
     anchors.right: parent.right

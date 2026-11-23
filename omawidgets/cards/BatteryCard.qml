@@ -48,7 +48,7 @@ Card {
 
   Row {
     width: parent.width
-    spacing: Style.spacing.lg
+    spacing: root.hudActive ? Style.space(14) : Style.spacing.lg
     visible: root.present
 
     RingGauge {
@@ -70,7 +70,7 @@ Card {
 
     Column {
       width: parent.width - gauge.width - parent.spacing
-      spacing: Style.spacing.sm
+      spacing: root.hudActive ? Style.space(3) : Style.spacing.sm
       anchors.verticalCenter: gauge.verticalCenter
 
       Text {
@@ -90,26 +90,53 @@ Card {
         textFormat: Text.PlainText
         width: parent.width
         visible: root.remaining !== ""
-        text: root.charging ? "until full" : "of use remaining"
+        text: root.hudActive
+          ? (root.charging ? "UNTIL FULL" : "REMAINING")
+          : (root.charging ? "until full" : "of use remaining")
         color: root.dim
         font.family: root.fontFamily
         font.pixelSize: Style.font.caption
+        font.bold: root.hudActive
+        font.letterSpacing: root.hudActive ? 1.0 : 0
         elide: Text.ElideRight
       }
 
-      Text {
-        textFormat: Text.PlainText
+      Row {
         width: parent.width
         visible: root.changeRate > 0.1
-        text: (root.charging ? "+" : "−") + Format.watts(root.changeRate)
-        color: root.hudActive
-          ? (root.charging ? ArasakaTheme.green : ArasakaTheme.cyan)
-          : root.dim
-        font.family: root.fontFamily
-        font.pixelSize: Style.font.bodySmall
-        font.bold: true
+        spacing: Style.space(6)
+
+        Text {
+          textFormat: Text.PlainText
+          visible: root.hudActive
+          text: root.charging ? "CHARGE" : "DRAW"
+          color: ArasakaTheme.textRose
+          font.family: root.fontFamily
+          font.pixelSize: Style.font.caption
+          font.bold: true
+          font.letterSpacing: 0.9
+          anchors.baseline: rateValue.baseline
+        }
+
+        Text {
+          id: rateValue
+          textFormat: Text.PlainText
+          text: (root.charging ? "+" : "−") + Format.watts(root.changeRate)
+          color: root.hudActive
+            ? (root.charging ? ArasakaTheme.green : ArasakaTheme.cyan)
+            : root.dim
+          font.family: root.fontFamily
+          font.pixelSize: Style.font.bodySmall
+          font.bold: true
+        }
       }
     }
+  }
+
+  Item {
+    visible: root.present && root.hudActive
+    width: parent.width
+    height: Style.space(2)
   }
 
   MeterBar {

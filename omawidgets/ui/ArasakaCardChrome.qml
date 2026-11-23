@@ -6,6 +6,7 @@ Item {
   id: root
 
   property string hudCode: ""
+  property bool hideBadge: false
 
   // Top-left bracket
   Image {
@@ -39,7 +40,11 @@ Item {
     anchors.topMargin: 5
     anchors.rightMargin: 7
     spacing: 4
-    opacity: 0.65
+    opacity: root.hideBadge ? 0 : 0.65
+
+    Behavior on opacity {
+      NumberAnimation { duration: 120 }
+    }
 
     Text {
       textFormat: Text.PlainText
