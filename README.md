@@ -82,36 +82,15 @@ You can also pass flags to `./install.sh` to select specific parts:
 ./scripts/install-omawidgets.sh   # Installs OmaWidgets (if missing) + Arasaka HUD card styling
 ```
 
-### Setting Up OmaWidgets Desktop Cards
+### Setting Up OmaWidgets Desktop Cards (1-Step Install)
 
-The desktop cards require the **[OmaWidgets](https://github.com/fabandrade88/OmaWidgets)** plugin (`io.github.fabandrade88.omawidgets`).
+The desktop cards require the **[OmaWidgets](https://github.com/fabandrade88/OmaWidgets)** plugin (`io.github.fabandrade88.omawidgets`). You can install the plugin, apply the Arasaka HUD styling, enable the **Performance**, **Battery**, and **Power profile** cards in `~/.config/omarchy/shell.json`, and restart the shell with a single command:
 
-1. **Install OmaWidgets** (if you don't already have it — `./scripts/install-omawidgets.sh` will also clone it automatically):
-   ```bash
-   git clone https://github.com/fabandrade88/OmaWidgets.git ~/.config/omarchy/plugins/io.github.fabandrade88.omawidgets
-   ```
-2. **Enable the desktop cards in `~/.config/omarchy/shell.json`** under `bar.layout.left` (or your preferred bar section):
-   ```json
-   {
-     "id": "io.github.fabandrade88.omawidgets",
-     "desktop": true,
-     "position": "top-left",
-     "marginX": 28,
-     "marginY": 20,
-     "cardWidth": 268,
-     "spacing": 10,
-     "columns": 1,
-     "opacity": 0.92,
-     "compact": false,
-     "grid": false,
-     "cards": ["system", "battery", "power"]
-   }
-   ```
-3. **Apply the Arasaka HUD overlay and restart the shell**:
-   ```bash
-   ./scripts/install-omawidgets.sh
-   omarchy restart shell
-   ```
+```bash
+curl -fsSL https://raw.githubusercontent.com/Xkalin1990/omarchy-arasaka-corp-theme/main/scripts/install-omawidgets.sh | bash
+```
+
+*(If you already cloned this repo, `./install.sh --omawidgets` or `./scripts/install-omawidgets.sh` does the exact same thing. Your existing `shell.json` is backed up before any edit, and if `io.github.fabandrade88.omawidgets` is already in your `shell.json`, your card layout is left untouched.)*
 
 ### Option 3: Theme Only via `omarchy theme install`
 
