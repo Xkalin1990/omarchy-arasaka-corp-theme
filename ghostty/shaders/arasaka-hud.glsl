@@ -1,24 +1,8 @@
 // Arasaka-Corp Subtle Full-Window CRT + HUD Shader for Ghostty
 // Colors matched to ~/.config/omarchy/themes/arasaka-corp/colors.toml
 
-vec2 crtCurve(vec2 uv, float amount) {
-    vec2 c = uv * 2.0 - 1.0;
-    vec2 offset = abs(c.yx) / vec2(7.0, 5.5);
-    c = c + c * offset * offset * amount;
-    return c * 0.5 + 0.5;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    vec2 rawUv = fragCoord / iResolution.xy;
-
-    // 1. Subtle CRT screen curvature across the whole window
-    vec2 uv = crtCurve(rawUv, 0.35);
-
-    // Mask outside curved screen bounds
-    if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
-        fragColor = vec4(0.04, 0.015, 0.025, 0.95);
-        return;
-    }
+    vec2 uv = fragCoord / iResolution.xy;
 
     // 2. Subtle chromatic aberration / phosphor fringe (restrained for crisp text)
     float chroma = 0.00065;
