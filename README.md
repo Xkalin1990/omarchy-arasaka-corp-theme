@@ -2,11 +2,11 @@
 
 A Cyberpunk 2077 Arasaka Corporation-themed complete desktop bundle for [Omarchy](https://omarchy.org/).
 
-> **Fork Notice:** This repository is a fork of [Doghouse-Mike/omarchy-daemon-mkii-theme](https://github.com/Doghouse-Mike/omarchy-daemon-mkii-theme) (which itself is adapted from the [Daemon 2.0 KDE Plasma theme](https://github.com/MathisP75/daemon-kde-mk2) by [MathisP75](https://github.com/MathisP75)). It preserves the upstream base while replacing the accent/foreground palette with Arasaka crimson/red, adding an Arasaka wallpaper, and bundling the Arasaka Terminal Plymouth bootsplash & reset/shutdown screens plus the Omarchy terminal screensaver.
+> **Fork Notice:** This repository is a fork of [Doghouse-Mike/omarchy-daemon-mkii-theme](https://github.com/Doghouse-Mike/omarchy-daemon-mkii-theme) (which itself is adapted from the [Daemon 2.0 KDE Plasma theme](https://github.com/MathisP75/daemon-kde-mk2) by [MathisP75](https://github.com/MathisP75)). It preserves the upstream base while replacing the accent/foreground palette with Arasaka crimson/red, adding an Arasaka wallpaper, and bundling the Arasaka Terminal Plymouth bootsplash & reset/shutdown screens, the Omarchy terminal screensaver, and the Ghostty terminal theme & CRT HUD shader.
 
 ## What Will Be Installed
 
-Running the bundled installer installs up to three components (or you can install each part individually):
+Running the bundled installer installs up to four components (or you can install each part individually):
 
 1. **Omarchy Theme (`arasaka-corp`)** — installed to `~/.config/omarchy/themes/arasaka-corp/` and applied via `omarchy theme set arasaka-corp`:
    - `colors.toml` — Arasaka crimson (`#B81D24`) accent, `#D85C60` foreground, `#210E15` / `#14101F` / `#040A10` dark backgrounds
@@ -17,6 +17,11 @@ Running the bundled installer installs up to three components (or you can instal
    - **Reset / Reboot**: `SYSTEM REBOOT` with `REBOOTING SYSTEM...` status
    - **Shutdown**: `SYSTEM SHUTDOWN` with `SHUTTING DOWN...` status
 3. **Terminal Screensaver (`screensaver.txt`)** — installed to `~/.config/omarchy/branding/screensaver.txt` (backing up any existing file first) for `omarchy screensaver` / `omarchy launch screensaver`.
+4. **Ghostty Terminal Theme (`ghostty`)** — installed to `~/.config/ghostty/` (backing up any existing `config` first):
+   - `config` — Arasaka-Corp Ghostty configuration referencing Omarchy's dynamic theme colors, Samurai watermark, custom shader, and GTK CSS
+   - `assets/samurai-logo.png` — centered low-opacity Cyberpunk 2077 Samurai oni-mask watermark (plus `arasaka-emblem` and `netrunner-status` assets)
+   - `shaders/arasaka-hud.glsl` — full-window subtle CRT + crimson HUD corner shader
+   - `gtk-arasaka.css` — custom GTK CSS preserving glass blur with `arasaka-corp` chrome + bottom-right netrunner status
 
 ## Screenshots
 
@@ -56,6 +61,7 @@ You can also pass flags to `./install.sh` to select specific parts:
 ./install.sh --theme        # Theme (colors, icons, wallpaper) only
 ./install.sh --plymouth     # Plymouth bootsplash & reset screen only
 ./install.sh --screensaver  # Terminal screensaver only
+./install.sh --ghostty      # Ghostty terminal theme & CRT HUD shader only
 ```
 
 ### Option 2: Install Individual Components Separately
@@ -64,6 +70,7 @@ You can also pass flags to `./install.sh` to select specific parts:
 ./scripts/install-theme.sh        # Installs ~/.config/omarchy/themes/arasaka-corp and applies it
 ./scripts/install-plymouth.sh     # Installs /usr/share/plymouth/themes/arasaka-terminal (requires sudo)
 ./scripts/install-screensaver.sh  # Installs ~/.config/omarchy/branding/screensaver.txt
+./scripts/install-ghostty.sh      # Installs ~/.config/ghostty/ config, assets, shader, and GTK CSS
 ```
 
 ### Option 3: Theme Only via `omarchy theme install`

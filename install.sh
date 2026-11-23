@@ -14,29 +14,34 @@ Without options, installs the complete Arasaka Corp bundle:
   1. Omarchy theme (colors.toml, Omarchroma-Icons, wallpapers)
   2. Plymouth bootsplash & reset/shutdown screen (arasaka-terminal)
   3. Omarchy terminal screensaver (screensaver.txt)
+  4. Ghostty terminal theme & CRT HUD shader (config, assets, shaders, gtk-arasaka.css)
 
 Options:
   --all          Install all components (default)
   --theme        Install only the Omarchy theme (colors, icons, wallpapers)
   --plymouth     Install only the Plymouth bootsplash & reset/shutdown screen
   --screensaver  Install only the Omarchy terminal screensaver
+  --ghostty      Install only the Ghostty terminal theme & shader
   -h, --help     Show this help message
 
 Individual component scripts are also available in ./scripts/:
   ./scripts/install-theme.sh
   ./scripts/install-plymouth.sh
   ./scripts/install-screensaver.sh
+  ./scripts/install-ghostty.sh
 EOF
 }
 
 DO_THEME=false
 DO_PLYMOUTH=false
 DO_SCREENSAVER=false
+DO_GHOSTTY=false
 
 if [[ $# -eq 0 ]]; then
   DO_THEME=true
   DO_PLYMOUTH=true
   DO_SCREENSAVER=true
+  DO_GHOSTTY=true
 else
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -44,6 +49,7 @@ else
         DO_THEME=true
         DO_PLYMOUTH=true
         DO_SCREENSAVER=true
+        DO_GHOSTTY=true
         ;;
       --theme)
         DO_THEME=true
@@ -53,6 +59,9 @@ else
         ;;
       --screensaver)
         DO_SCREENSAVER=true
+        ;;
+      --ghostty)
+        DO_GHOSTTY=true
         ;;
       -h|--help)
         usage
@@ -74,20 +83,26 @@ echo "=========================================="
 
 if [[ "${DO_THEME}" == true ]]; then
   echo ""
-  echo "[1/3] Theme (colors, icons, wallpaper)..."
+  echo "[1/4] Theme (colors, icons, wallpaper)..."
   bash "${SCRIPTS_DIR}/install-theme.sh"
 fi
 
 if [[ "${DO_PLYMOUTH}" == true ]]; then
   echo ""
-  echo "[2/3] Plymouth bootsplash & reset/shutdown screen..."
+  echo "[2/4] Plymouth bootsplash & reset/shutdown screen..."
   bash "${SCRIPTS_DIR}/install-plymouth.sh"
 fi
 
 if [[ "${DO_SCREENSAVER}" == true ]]; then
   echo ""
-  echo "[3/3] Terminal screensaver..."
+  echo "[3/4] Terminal screensaver..."
   bash "${SCRIPTS_DIR}/install-screensaver.sh"
+fi
+
+if [[ "${DO_GHOSTTY}" == true ]]; then
+  echo ""
+  echo "[4/4] Ghostty terminal theme & shader..."
+  bash "${SCRIPTS_DIR}/install-ghostty.sh"
 fi
 
 echo ""

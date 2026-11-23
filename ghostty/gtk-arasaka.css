@@ -1,0 +1,40 @@
+/* Arasaka-Corp GTK Custom CSS for Ghostty
+   Preserves Omarchy glass backdrop blur while styling window/tab chrome. */
+
+window {
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(251, 48, 72, 0.35);
+  background-image: url("file://__HOME__/.config/ghostty/assets/netrunner-status.png");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 14px) calc(100% - 10px);
+}
+
+headerbar {
+  background-color: rgba(20, 16, 31, 0.85);
+  color: #D85C60;
+  border-bottom: 1px solid rgba(184, 29, 36, 0.45);
+  box-shadow: none;
+}
+
+tabbar tabbox {
+  background-color: rgba(20, 16, 31, 0.78);
+  border-bottom: 1px solid rgba(184, 29, 36, 0.35);
+}
+
+tabbar tab {
+  color: #A1A9B1;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 4px 10px;
+}
+
+tabbar tab:selected {
+  color: #FCFCFC;
+  background-color: rgba(90, 26, 34, 0.75);
+  border-bottom: 2px solid #FB3048;
+}
+
+tabbar tab:hover:not(:selected) {
+  color: #D85C60;
+  background-color: rgba(51, 19, 25, 0.55);
+}
