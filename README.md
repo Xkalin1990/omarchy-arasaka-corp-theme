@@ -6,7 +6,7 @@ A Cyberpunk 2077 Arasaka Corporation-themed complete desktop bundle for [Omarchy
 
 ## What Will Be Installed
 
-Running the bundled installer installs up to four components (or you can install each part individually):
+Running the bundled installer installs up to five components (or you can install each part individually):
 
 1. **Omarchy Theme (`arasaka-corp`)** — installed to `~/.config/omarchy/themes/arasaka-corp/` and applied via `omarchy theme set arasaka-corp`:
    - `colors.toml` — Arasaka crimson (`#B81D24`) accent, `#D85C60` foreground, `#210E15` / `#14101F` / `#040A10` dark backgrounds
@@ -22,6 +22,10 @@ Running the bundled installer installs up to four components (or you can install
    - `assets/samurai-logo.png` — centered low-opacity Cyberpunk 2077 Samurai oni-mask watermark (plus `arasaka-emblem` and `netrunner-status` assets)
    - `shaders/arasaka-hud.glsl` — full-window subtle CRT + crimson HUD corner shader
    - `gtk-arasaka.css` — custom GTK CSS preserving glass blur with `arasaka-corp` chrome + bottom-right netrunner status
+5. **OmaWidgets Desktop Cards (`omawidgets`)** — theme-scoped Arasaka HUD styling for the **[OmaWidgets](https://github.com/fabandrade88/OmaWidgets)** Omarchy shell plugin (`io.github.fabandrade88.omawidgets`), specifically targeting the **Performance** (`system`), **Battery** (`battery`), and **Power profile** (`power`) desktop cards:
+   - Sharp `0px` angular HUD frame with `#14101F` backdrop, `#FB3048` borders, SVG corner brackets, gradient header divider, and subtle `ARASAKA // SYS|PWR|MODE` crest tag
+   - `JetBrainsMono Nerd Font` uppercase tracked labels and `#FB3048` / `#5DF4FE` crimson-and-cyan telemetry gauges, bars, and tactical power profile buttons
+   - **Theme-scoped**: automatically activates only when `arasaka-corp` is the active Omarchy theme and reverts cleanly to standard styling on any other theme
 
 ## Screenshots
 
@@ -65,6 +69,7 @@ You can also pass flags to `./install.sh` to select specific parts:
 ./install.sh --plymouth     # Plymouth bootsplash & reset screen only
 ./install.sh --screensaver  # Terminal screensaver only
 ./install.sh --ghostty      # Ghostty terminal theme & CRT HUD shader only
+./install.sh --omawidgets   # OmaWidgets Arasaka HUD cards only
 ```
 
 ### Option 2: Install Individual Components Separately
@@ -74,7 +79,39 @@ You can also pass flags to `./install.sh` to select specific parts:
 ./scripts/install-plymouth.sh     # Installs /usr/share/plymouth/themes/arasaka-terminal (requires sudo)
 ./scripts/install-screensaver.sh  # Installs ~/.config/omarchy/branding/screensaver.txt
 ./scripts/install-ghostty.sh      # Installs ~/.config/ghostty/ config, assets, shader, and GTK CSS
+./scripts/install-omawidgets.sh   # Installs OmaWidgets (if missing) + Arasaka HUD card styling
 ```
+
+### Setting Up OmaWidgets Desktop Cards
+
+The desktop cards require the **[OmaWidgets](https://github.com/fabandrade88/OmaWidgets)** plugin (`io.github.fabandrade88.omawidgets`).
+
+1. **Install OmaWidgets** (if you don't already have it — `./scripts/install-omawidgets.sh` will also clone it automatically):
+   ```bash
+   git clone https://github.com/fabandrade88/OmaWidgets.git ~/.config/omarchy/plugins/io.github.fabandrade88.omawidgets
+   ```
+2. **Enable the desktop cards in `~/.config/omarchy/shell.json`** under `bar.layout.left` (or your preferred bar section):
+   ```json
+   {
+     "id": "io.github.fabandrade88.omawidgets",
+     "desktop": true,
+     "position": "top-left",
+     "marginX": 28,
+     "marginY": 20,
+     "cardWidth": 268,
+     "spacing": 10,
+     "columns": 1,
+     "opacity": 0.92,
+     "compact": false,
+     "grid": false,
+     "cards": ["system", "battery", "power"]
+   }
+   ```
+3. **Apply the Arasaka HUD overlay and restart the shell**:
+   ```bash
+   ./scripts/install-omawidgets.sh
+   omarchy restart shell
+   ```
 
 ### Option 3: Theme Only via `omarchy theme install`
 

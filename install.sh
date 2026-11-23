@@ -15,6 +15,7 @@ Without options, installs the complete Arasaka Corp bundle:
   2. Plymouth bootsplash & reset/shutdown screen (arasaka-terminal)
   3. Omarchy terminal screensaver (screensaver.txt)
   4. Ghostty terminal theme & CRT HUD shader (config, assets, shaders, gtk-arasaka.css)
+  5. OmaWidgets Arasaka HUD cards (Performance, Battery, Power profile)
 
 Options:
   --all          Install all components (default)
@@ -22,6 +23,7 @@ Options:
   --plymouth     Install only the Plymouth bootsplash & reset/shutdown screen
   --screensaver  Install only the Omarchy terminal screensaver
   --ghostty      Install only the Ghostty terminal theme & shader
+  --omawidgets   Install only the OmaWidgets Arasaka HUD card styling
   -h, --help     Show this help message
 
 Individual component scripts are also available in ./scripts/:
@@ -29,6 +31,7 @@ Individual component scripts are also available in ./scripts/:
   ./scripts/install-plymouth.sh
   ./scripts/install-screensaver.sh
   ./scripts/install-ghostty.sh
+  ./scripts/install-omawidgets.sh
 EOF
 }
 
@@ -36,12 +39,14 @@ DO_THEME=false
 DO_PLYMOUTH=false
 DO_SCREENSAVER=false
 DO_GHOSTTY=false
+DO_OMAWIDGETS=false
 
 if [[ $# -eq 0 ]]; then
   DO_THEME=true
   DO_PLYMOUTH=true
   DO_SCREENSAVER=true
   DO_GHOSTTY=true
+  DO_OMAWIDGETS=true
 else
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -50,6 +55,7 @@ else
         DO_PLYMOUTH=true
         DO_SCREENSAVER=true
         DO_GHOSTTY=true
+        DO_OMAWIDGETS=true
         ;;
       --theme)
         DO_THEME=true
@@ -62,6 +68,9 @@ else
         ;;
       --ghostty)
         DO_GHOSTTY=true
+        ;;
+      --omawidgets)
+        DO_OMAWIDGETS=true
         ;;
       -h|--help)
         usage
@@ -101,8 +110,14 @@ fi
 
 if [[ "${DO_GHOSTTY}" == true ]]; then
   echo ""
-  echo "[4/4] Ghostty terminal theme & shader..."
+  echo "[4/5] Ghostty terminal theme & shader..."
   bash "${SCRIPTS_DIR}/install-ghostty.sh"
+fi
+
+if [[ "${DO_OMAWIDGETS}" == true ]]; then
+  echo ""
+  echo "[5/5] OmaWidgets Arasaka HUD cards..."
+  bash "${SCRIPTS_DIR}/install-omawidgets.sh"
 fi
 
 echo ""
