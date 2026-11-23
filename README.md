@@ -40,6 +40,9 @@ Running the bundled installer installs up to four components (or you can install
 ### Screensaver
 ![Screensaver](screenshots/screensaver.png)
 
+### Ghostty Terminal
+![Ghostty Terminal](screenshots/ghostty-terminal.png)
+
 ## Installation
 
 Clone the repository:
