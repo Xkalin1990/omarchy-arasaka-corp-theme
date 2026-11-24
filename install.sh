@@ -16,6 +16,7 @@ Without options, installs the complete Arasaka Corp bundle:
   3. Omarchy terminal screensaver (screensaver.txt)
   4. Ghostty terminal theme & CRT HUD shader (config, assets, shaders, gtk-arasaka.css)
   5. OmaWidgets Arasaka HUD cards (Performance, Battery, Power profile)
+  6. Global Hyprland CRT phosphor glow shader (shaders/crt-scanlines.glsl)
 
 Options:
   --all          Install all components (default)
@@ -24,6 +25,7 @@ Options:
   --screensaver  Install only the Omarchy terminal screensaver
   --ghostty      Install only the Ghostty terminal theme & shader
   --omawidgets   Install only the OmaWidgets Arasaka HUD card styling
+  --shader       Install only the global Hyprland CRT phosphor glow shader
   -h, --help     Show this help message
 
 Individual component scripts are also available in ./scripts/:
@@ -32,6 +34,7 @@ Individual component scripts are also available in ./scripts/:
   ./scripts/install-screensaver.sh
   ./scripts/install-ghostty.sh
   ./scripts/install-omawidgets.sh
+  ./scripts/install-shader.sh
 EOF
 }
 
@@ -40,6 +43,7 @@ DO_PLYMOUTH=false
 DO_SCREENSAVER=false
 DO_GHOSTTY=false
 DO_OMAWIDGETS=false
+DO_SHADER=false
 
 if [[ $# -eq 0 ]]; then
   DO_THEME=true
@@ -47,6 +51,7 @@ if [[ $# -eq 0 ]]; then
   DO_SCREENSAVER=true
   DO_GHOSTTY=true
   DO_OMAWIDGETS=true
+  DO_SHADER=true
 else
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -56,6 +61,7 @@ else
         DO_SCREENSAVER=true
         DO_GHOSTTY=true
         DO_OMAWIDGETS=true
+        DO_SHADER=true
         ;;
       --theme)
         DO_THEME=true
@@ -71,6 +77,9 @@ else
         ;;
       --omawidgets)
         DO_OMAWIDGETS=true
+        ;;
+      --shader)
+        DO_SHADER=true
         ;;
       -h|--help)
         usage
@@ -116,8 +125,14 @@ fi
 
 if [[ "${DO_OMAWIDGETS}" == true ]]; then
   echo ""
-  echo "[5/5] OmaWidgets Arasaka HUD cards..."
+  echo "[5/6] OmaWidgets Arasaka HUD cards..."
   bash "${SCRIPTS_DIR}/install-omawidgets.sh"
+fi
+
+if [[ "${DO_SHADER}" == true ]]; then
+  echo ""
+  echo "[6/6] Global Hyprland CRT phosphor glow shader..."
+  bash "${SCRIPTS_DIR}/install-shader.sh"
 fi
 
 echo ""

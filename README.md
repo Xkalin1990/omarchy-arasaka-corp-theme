@@ -26,6 +26,9 @@ Running the bundled installer installs up to five components (or you can install
    - Sharp `0px` angular HUD frame with `#14101F` backdrop, `#FB3048` borders, SVG corner brackets, gradient header divider, and subtle `ARASAKA // SYS|PWR|MODE` crest tag
    - `JetBrainsMono Nerd Font` uppercase tracked labels and `#FB3048` / `#5DF4FE` crimson-and-cyan telemetry gauges, bars, and tactical power profile buttons
    - **Theme-scoped**: automatically activates only when `arasaka-corp` is the active Omarchy theme and reverts cleanly to standard styling on any other theme
+6. **Global CRT Phosphor Glow Shader (`shaders/crt-scanlines.glsl`)** — Hyprland `decoration.screen_shader` installed to `~/.config/hypr/shaders/crt-scanlines.glsl` and wired into `~/.config/hypr/looknfeel.lua`:
+   - Two-ring 16-tap phosphor bloom for bright text, UI highlights, and dark crimson/red accents (keeping deep dark backgrounds clean)
+   - Subtle horizontal CRT scanlines (~12% modulation) and edge vignette
 
 ## Screenshots
 
@@ -70,6 +73,7 @@ You can also pass flags to `./install.sh` to select specific parts:
 ./install.sh --screensaver  # Terminal screensaver only
 ./install.sh --ghostty      # Ghostty terminal theme & CRT HUD shader only
 ./install.sh --omawidgets   # OmaWidgets Arasaka HUD cards only
+./install.sh --shader       # Global Hyprland CRT phosphor glow shader only
 ```
 
 ### Option 2: Install Individual Components Separately
@@ -80,6 +84,7 @@ You can also pass flags to `./install.sh` to select specific parts:
 ./scripts/install-screensaver.sh  # Installs ~/.config/omarchy/branding/screensaver.txt
 ./scripts/install-ghostty.sh      # Installs ~/.config/ghostty/ config, assets, shader, and GTK CSS
 ./scripts/install-omawidgets.sh   # Installs OmaWidgets (if missing) + Arasaka HUD card styling
+./scripts/install-shader.sh       # Installs global Hyprland CRT phosphor glow shader
 ```
 
 ### Setting Up OmaWidgets Desktop Cards (1-Step Install)
