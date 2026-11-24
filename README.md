@@ -6,29 +6,37 @@ A Cyberpunk 2077 Arasaka Corporation-themed complete desktop bundle for [Omarchy
 
 ## What Will Be Installed
 
-Running the bundled installer installs up to five components (or you can install each part individually):
+Running the bundled installer installs up to six components (or you can install each part individually):
 
 1. **Omarchy Theme (`arasaka-corp`)** — installed to `~/.config/omarchy/themes/arasaka-corp/` and applied via `omarchy theme set arasaka-corp`:
    - `colors.toml` — Arasaka crimson (`#B81D24`) accent, `#D85C60` foreground, `#210E15` / `#14101F` / `#040A10` dark backgrounds
    - `icons.theme` — `Omarchroma-Icons`
-   - `backgrounds/` — `00-arasaka-1920x1080.png` (default Arasaka wallpaper) plus the original Daemon MKII wallpapers
+   - `backgrounds/` — `00-arasaka-1920x1080.png` (default Arasaka wallpaper) plus the original Daemon MKII wallpapers (cycle with `omarchy theme bg next`)
 2. **Plymouth Bootsplash & Reset/Shutdown Screen (`arasaka-terminal`)** — installed to `/usr/share/plymouth/themes/arasaka-terminal/` and set as default (`plymouth-set-default-theme -R arasaka-terminal` + `limine-mkinitcpio` if present):
    - **Boot / LUKS Unlock**: `SECURITY LOGIN` prompt with `UID_` prefix, masked password bullets, glitch intro, and `ACCESS GRANTED // BOOTING` transition
    - **Reset / Reboot**: `SYSTEM REBOOT` with `REBOOTING SYSTEM...` status
    - **Shutdown**: `SYSTEM SHUTDOWN` with `SHUTTING DOWN...` status
-3. **Terminal Screensaver (`screensaver.txt`)** — installed to `~/.config/omarchy/branding/screensaver.txt` (backing up any existing file first) for `omarchy screensaver` / `omarchy launch screensaver`.
+3. **Terminal Screensaver (`screensaver.txt`)** — installed to `~/.config/omarchy/branding/screensaver.txt` (backing up any existing file first) for `omarchy launch screensaver force`.
 4. **Ghostty Terminal Theme (`ghostty`)** — installed to `~/.config/ghostty/` (backing up any existing `config` first):
-   - `config` — Arasaka-Corp Ghostty configuration referencing Omarchy's dynamic theme colors, Samurai watermark, custom shader, and GTK CSS
-   - `assets/samurai-logo.png` — centered low-opacity Cyberpunk 2077 Samurai oni-mask watermark (plus `arasaka-emblem` and `netrunner-status` assets)
+   - `config` — Arasaka-Corp Ghostty configuration referencing Omarchy's dynamic theme colors, Samurai watermark, custom shader, and GTK CSS (note: `custom-shader-animation = true` continuously redraws at display refresh rate; set to `false` in `~/.config/ghostty/config` to save battery)
+   - `assets/samurai-logo.png` — centered low-opacity Cyberpunk 2077 Samurai oni-mask watermark (plus `arasaka-emblem.{png,svg}` and `netrunner-status.{png,svg}` assets)
    - `shaders/arasaka-hud.glsl` — full-window subtle CRT + crimson HUD corner shader
-   - `gtk-arasaka.css` — custom GTK CSS preserving glass blur with `arasaka-corp` chrome + bottom-right netrunner status
+   - `gtk-arasaka.css` — custom GTK CSS styling window/tab chrome + bottom-right netrunner status
 5. **OmaWidgets Desktop Cards (`omawidgets`)** — theme-scoped Arasaka HUD styling for the **[OmaWidgets](https://github.com/fabandrade88/OmaWidgets)** Omarchy shell plugin (`io.github.fabandrade88.omawidgets`), specifically targeting the **Performance** (`system`), **Battery** (`battery`), and **Power profile** (`power`) desktop cards:
    - Sharp `0px` angular HUD frame with `#14101F` backdrop, `#FB3048` borders, SVG corner brackets, gradient header divider, and subtle `ARASAKA // SYS|PWR|MODE` crest tag
    - `JetBrainsMono Nerd Font` uppercase tracked labels and `#FB3048` / `#5DF4FE` crimson-and-cyan telemetry gauges, bars, and tactical power profile buttons
    - **Theme-scoped**: automatically activates only when `arasaka-corp` is the active Omarchy theme and reverts cleanly to standard styling on any other theme
 6. **Global CRT Phosphor Glow Shader (`shaders/crt-scanlines.glsl`)** — Hyprland `decoration.screen_shader` installed to `~/.config/hypr/shaders/crt-scanlines.glsl` and wired into `~/.config/hypr/looknfeel.lua`:
-   - Two-ring 16-tap phosphor bloom for bright text, UI highlights, and dark crimson/red accents (keeping deep dark backgrounds clean)
+   - Two-ring 16-tap amber/crimson phosphor bloom for bright text, UI highlights, and dark crimson/red accents
    - Subtle horizontal CRT scanlines (~12% modulation) and edge vignette
+   - To disable later, set `screen_shader = "[[EMPTY]]"` in `~/.config/hypr/looknfeel.lua` or run `./uninstall.sh`
+
+## Prerequisites
+
+- [Omarchy](https://omarchy.org/) (`omarchy` CLI, Hyprland, `JetBrainsMono Nerd Font`)
+- `git` and `python3` (for OmaWidgets installation and `shell.json` / config updates)
+- `ghostty` and `Liberation Mono` font (for the Ghostty theme)
+- `plymouth` and `sudo` (optional, for the Plymouth bootsplash)
 
 ## Screenshots
 
@@ -69,7 +77,7 @@ You can also pass flags to `./install.sh` to select specific parts:
 
 ```bash
 ./install.sh --theme        # Theme (colors, icons, wallpaper) only
-./install.sh --plymouth     # Plymouth bootsplash & reset screen only
+./install.sh --plymouth     # Plymouth bootsplash & reset/shutdown screen only
 ./install.sh --screensaver  # Terminal screensaver only
 ./install.sh --ghostty      # Ghostty terminal theme & CRT HUD shader only
 ./install.sh --omawidgets   # OmaWidgets Arasaka HUD cards only
@@ -99,10 +107,18 @@ curl -fsSL https://raw.githubusercontent.com/Xkalin1990/omarchy-arasaka-corp-the
 
 ### Option 3: Theme Only via `omarchy theme install`
 
-If you only want the Omarchy colors, icons, and wallpapers without the Plymouth theme or screensaver:
+If you only want the Omarchy colors, icons, and wallpapers (without Plymouth, screensaver, Ghostty, OmaWidgets, or the global Hyprland shader):
 
 ```bash
 omarchy theme install https://github.com/Xkalin1990/omarchy-arasaka-corp-theme
+```
+
+## Uninstall
+
+```bash
+chmod +x uninstall.sh
+./uninstall.sh
+omarchy theme set <other-theme>
 ```
 
 ## Color Palette

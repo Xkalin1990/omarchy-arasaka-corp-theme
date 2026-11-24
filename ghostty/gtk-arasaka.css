@@ -2,9 +2,8 @@
    Preserves Omarchy glass backdrop blur while styling window/tab chrome. */
 
 window {
-  backdrop-filter: blur(20px);
   border: 1px solid rgba(251, 48, 72, 0.35);
-  background-image: url("file://__HOME__/.config/ghostty/assets/netrunner-status.png");
+  background-image: url("file://__CONFIG_DIR__/assets/netrunner-status.png");
   background-repeat: no-repeat;
   background-position: calc(100% - 14px) calc(100% - 10px);
 }

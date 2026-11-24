@@ -44,40 +44,58 @@ cp "${SRC_DIR}/cards/"* "${DEST_DIR}/cards/"
 cp "${SRC_DIR}/ui/"* "${DEST_DIR}/ui/"
 
 # 3. Auto-enable desktop cards in ~/.config/omarchy/shell.json if not already configured
-if [[ -f "${SHELL_JSON}" ]] && command -v python3 >/dev/null 2>&1; then
-  if ! grep -q '"io.github.fabandrade88.omawidgets"' "${SHELL_JSON}"; then
-    BACKUP="${SHELL_JSON}.bak.$(date +%s)"
-    cp "${SHELL_JSON}" "${BACKUP}"
-    echo "Backing up ${SHELL_JSON} to ${BACKUP} and enabling OmaWidgets desktop cards..."
-    python3 - "${SHELL_JSON}" <<'PY'
-import json, sys
+if [[ ! -f "${SHELL_JSON}" ]]; then
+  echo "Warning: ${SHELL_JSON} not found; enable 'io.github.fabandrade88.omawidgets' manually in shell.json." >&2
+elif ! command -v python3 >/dev/null 2>&1; then
+  echo "Warning: 'python3' not found; skipping automatic ${SHELL_JSON} update." >&2
+else
+  python3 - "${SHELL_JSON}" <<'PY'
+import json, shutil, sys, time
 
 path = sys.argv[1]
 with open(path, "r", encoding="utf-8") as f:
     data = json.load(f)
 
-layout = data.setdefault("bar", {}).setdefault("layout", {})
-left = layout.setdefault("left", [])
-left.append({
-    "id": "io.github.fabandrade88.omawidgets",
-    "desktop": True,
-    "position": "top-left",
-    "marginX": 28,
-    "marginY": 20,
-    "cardWidth": 268,
-    "spacing": 10,
-    "columns": 1,
-    "opacity": 0.92,
-    "compact": False,
-    "grid": False,
-    "cards": ["system", "battery", "power"],
-})
+bar = data.setdefault("bar", {})
+if not isinstance(bar, dict):
+    bar = {}
+    data["bar"] = bar
+layout = bar.setdefault("layout", {})
+if not isinstance(layout, dict):
+    layout = {}
+    bar["layout"] = layout
+left = layout.get("left")
+if not isinstance(left, list):
+    left = []
+    layout["left"] = left
 
-with open(path, "w", encoding="utf-8") as f:
-    json.dump(data, f, indent=2)
-    f.write("\n")
+already_enabled = any(
+    isinstance(item, dict) and item.get("id") == "io.github.fabandrade88.omawidgets"
+    for item in left
+)
+
+if not already_enabled:
+    backup = f"{path}.bak.{int(time.time())}"
+    shutil.copy2(path, backup)
+    print(f"Backing up {path} to {backup} and enabling OmaWidgets desktop cards...")
+    left.append({
+        "id": "io.github.fabandrade88.omawidgets",
+        "desktop": True,
+        "position": "top-left",
+        "marginX": 28,
+        "marginY": 20,
+        "cardWidth": 268,
+        "spacing": 10,
+        "columns": 1,
+        "opacity": 0.92,
+        "compact": False,
+        "grid": False,
+        "cards": ["system", "battery", "power"],
+    })
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
 PY
-  fi
 fi
 
 # 4. Restart Omarchy shell so new singletons and assets take effect immediately

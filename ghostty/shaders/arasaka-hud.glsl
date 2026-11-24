@@ -48,5 +48,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec3 hudRed = vec3(0.984, 0.188, 0.282); // #FB3048
     color = mix(color, hudRed, bracket * 0.40 * pulse);
 
-    fragColor = vec4(color, center.a);
+    float outAlpha = max(center.a, bracket * 0.40 * pulse);
+    fragColor = vec4(color, outAlpha);
 }

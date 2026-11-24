@@ -12,21 +12,28 @@ Cyberpunk 2077 Arasaka Corporation security terminal Plymouth theme for boot, LU
 ## Prerequisites
 
 - `plymouth`
+- `sudo` access (to install to `/usr/share/plymouth/themes/arasaka-terminal` and rebuild initramfs)
 - `JetBrainsMono Nerd Font` (included by default on Omarchy)
 
 ## Install
 
+From the repository root:
+
 ```bash
-git clone https://github.com/Xkalin1990/arasaka-terminal-plymouth.git
-cd arasaka-terminal-plymouth
+./install.sh --plymouth
+```
+
+Or from this directory:
+
+```bash
 ./install.sh
 ```
 
-`install.sh` copies the theme to `/usr/share/plymouth/themes/arasaka-terminal`, sets `arasaka-terminal` as the default Plymouth theme (`plymouth-set-default-theme -R arasaka-terminal`), and runs `limine-mkinitcpio` if present.
+`install.sh` saves your previous Plymouth theme, copies the theme to `/usr/share/plymouth/themes/arasaka-terminal`, sets `arasaka-terminal` as the default Plymouth theme (`sudo plymouth-set-default-theme -R arasaka-terminal`), and runs `sudo limine-mkinitcpio` if present.
 
 ## Regenerating Assets (Optional)
 
-If you want to tweak or regenerate the PNG assets from `arasaka_wordmark.svg` and the script's palette:
+If you want to tweak or regenerate the PNG assets (requires `python3`, `Pillow`, `librsvg`/`rsvg-convert`, `fontconfig`, and `noto-fonts-cjk`):
 
 ```bash
 python3 generate_assets.py

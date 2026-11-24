@@ -95,43 +95,55 @@ else
   done
 fi
 
+TOTAL_STEPS=0
+for flag in "${DO_THEME}" "${DO_PLYMOUTH}" "${DO_SCREENSAVER}" "${DO_GHOSTTY}" "${DO_OMAWIDGETS}" "${DO_SHADER}"; do
+  [[ "${flag}" == true ]] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
+done
+STEP=0
+
 echo "=========================================="
 echo "  ARASAKA CORP // OMARCHY THEME BUNDLE"
 echo "=========================================="
 
 if [[ "${DO_THEME}" == true ]]; then
+  STEP=$((STEP + 1))
   echo ""
-  echo "[1/4] Theme (colors, icons, wallpaper)..."
+  echo "[${STEP}/${TOTAL_STEPS}] Theme (colors, icons, wallpaper)..."
   bash "${SCRIPTS_DIR}/install-theme.sh"
 fi
 
 if [[ "${DO_PLYMOUTH}" == true ]]; then
+  STEP=$((STEP + 1))
   echo ""
-  echo "[2/4] Plymouth bootsplash & reset/shutdown screen..."
+  echo "[${STEP}/${TOTAL_STEPS}] Plymouth bootsplash & reset/shutdown screen..."
   bash "${SCRIPTS_DIR}/install-plymouth.sh"
 fi
 
 if [[ "${DO_SCREENSAVER}" == true ]]; then
+  STEP=$((STEP + 1))
   echo ""
-  echo "[3/4] Terminal screensaver..."
+  echo "[${STEP}/${TOTAL_STEPS}] Terminal screensaver..."
   bash "${SCRIPTS_DIR}/install-screensaver.sh"
 fi
 
 if [[ "${DO_GHOSTTY}" == true ]]; then
+  STEP=$((STEP + 1))
   echo ""
-  echo "[4/5] Ghostty terminal theme & shader..."
+  echo "[${STEP}/${TOTAL_STEPS}] Ghostty terminal theme & shader..."
   bash "${SCRIPTS_DIR}/install-ghostty.sh"
 fi
 
 if [[ "${DO_OMAWIDGETS}" == true ]]; then
+  STEP=$((STEP + 1))
   echo ""
-  echo "[5/6] OmaWidgets Arasaka HUD cards..."
+  echo "[${STEP}/${TOTAL_STEPS}] OmaWidgets Arasaka HUD cards..."
   bash "${SCRIPTS_DIR}/install-omawidgets.sh"
 fi
 
 if [[ "${DO_SHADER}" == true ]]; then
+  STEP=$((STEP + 1))
   echo ""
-  echo "[6/6] Global Hyprland CRT phosphor glow shader..."
+  echo "[${STEP}/${TOTAL_STEPS}] Global Hyprland CRT phosphor glow shader..."
   bash "${SCRIPTS_DIR}/install-shader.sh"
 fi
 

@@ -95,7 +95,7 @@ Item {
     Rectangle {
       anchors.fill: parent
       radius: width / 2
-      color: Color.popups.background
+      color: root.arasakaStyle ? ArasakaTheme.bg : Color.popups.background
     }
 
     Text {
@@ -103,7 +103,7 @@ Item {
       textFormat: Text.PlainText
       text: "󰉁"
       color: root.fill
-      font.family: Style.font.family
+      font.family: root.arasakaStyle ? ArasakaTheme.fontFamily : Style.font.family
       font.pixelSize: parent.height * 0.82
     }
   }

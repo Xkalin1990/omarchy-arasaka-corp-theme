@@ -41,11 +41,11 @@ mouse-scroll-multiplier = 0.95
 async-backend = epoll
 
 # Arasaka-Corp visual theme & graphics
-background-image = ~/.config/ghostty/assets/samurai-logo.png
+background-image = __CONFIG_DIR__/assets/samurai-logo.png
 background-image-opacity = 0.08
 background-image-position = center
 background-image-fit = none
 background-image-repeat = false
-custom-shader = ~/.config/ghostty/shaders/arasaka-hud.glsl
+custom-shader = __CONFIG_DIR__/shaders/arasaka-hud.glsl
 custom-shader-animation = true
-gtk-custom-css = ~/.config/ghostty/gtk-arasaka.css
+gtk-custom-css = __CONFIG_DIR__/gtk-arasaka.css

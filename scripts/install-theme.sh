@@ -4,7 +4,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 THEME_SLUG="arasaka-corp"
-DEST_DIR="${HOME}/.config/omarchy/themes/${THEME_SLUG}"
+CONFIG_DIR="${XDG_CONFIG_HOME:-${HOME}/.config}"
+DEST_DIR="${CONFIG_DIR}/omarchy/themes/${THEME_SLUG}"
 
 echo "Installing Arasaka Corp Omarchy theme to ${DEST_DIR}..."
 mkdir -p "${DEST_DIR}/backgrounds"

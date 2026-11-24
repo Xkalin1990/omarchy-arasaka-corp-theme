@@ -396,6 +396,10 @@ fun display_normal_callback() {
 }
 
 fun display_message_callback(text) {
+  if (text == "") {
+    hide_message_callback("");
+    return;
+  }
   msg_img = Image.Text(text, global.red_r, global.red_g, global.red_b, 1, "JetBrainsMono Nerd Font 13");
   status_sprite.SetImage(msg_img);
   status_sprite.SetOpacity(1);
