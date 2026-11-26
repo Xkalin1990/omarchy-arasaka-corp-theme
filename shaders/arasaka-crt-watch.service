@@ -1,0 +1,13 @@
+[Unit]
+Description=Arasaka Corp theme-aware & app-aware Hyprland CRT shader watcher
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/arasaka-crt-watch
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

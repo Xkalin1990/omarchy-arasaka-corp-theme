@@ -6,9 +6,18 @@ THEME_SLUG="arasaka-corp"
 
 echo "Uninstalling Arasaka Corp theme bundle..."
 
-# 1. Disable global Hyprland CRT shader
+# 1. Disable Hyprland CRT shader & remove theme/app-aware watcher
 LOOKNFEEL="${CONFIG_DIR}/hypr/looknfeel.lua"
 SHADER_DEST="${CONFIG_DIR}/hypr/shaders/crt-scanlines.glsl"
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl --user disable --now arasaka-crt-watch.service >/dev/null 2>&1 || true
+fi
+rm -f "${HOME}/.local/bin/arasaka-crt-watch" \
+      "${CONFIG_DIR}/systemd/user/arasaka-crt-watch.service" \
+      "${CONFIG_DIR}/omarchy/hooks/theme-set.d/arasaka-crt-sync.sh"
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl --user daemon-reload >/dev/null 2>&1 || true
+fi
 if [[ -f "${LOOKNFEEL}" ]] && grep -qF "${SHADER_DEST}" "${LOOKNFEEL}"; then
   python3 - "${LOOKNFEEL}" "${SHADER_DEST}" <<'PY'
 import re, sys
@@ -27,6 +36,7 @@ PY
 fi
 rm -f "${SHADER_DEST}"
 if command -v hyprctl >/dev/null 2>&1 && [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+  hyprctl eval 'hl.config({ decoration = { screen_shader = "[[EMPTY]]" } })' >/dev/null 2>&1 || true
   hyprctl reload >/dev/null || true
 fi
 

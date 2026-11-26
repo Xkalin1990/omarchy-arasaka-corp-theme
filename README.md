@@ -26,10 +26,11 @@ Running the bundled installer installs up to six components (or you can install 
    - Sharp `0px` angular HUD frame with `#14101F` backdrop, `#FB3048` borders, SVG corner brackets, gradient header divider, and subtle `ARASAKA // SYS|PWR|MODE` crest tag
    - `JetBrainsMono Nerd Font` uppercase tracked labels and `#FB3048` / `#5DF4FE` crimson-and-cyan telemetry gauges, bars, and tactical power profile buttons
    - **Theme-scoped**: automatically activates only when `arasaka-corp` is the active Omarchy theme and reverts cleanly to standard styling on any other theme
-6. **Global CRT Phosphor Glow Shader (`shaders/crt-scanlines.glsl`)** — Hyprland `decoration.screen_shader` installed to `~/.config/hypr/shaders/crt-scanlines.glsl` and wired into `~/.config/hypr/looknfeel.lua`:
-   - Two-ring 16-tap amber/crimson phosphor bloom for bright text, UI highlights, and dark crimson/red accents
-   - Subtle horizontal CRT scanlines (~12% modulation) and edge vignette
-   - To disable later, set `screen_shader = "[[EMPTY]]"` in `~/.config/hypr/looknfeel.lua` or run `./uninstall.sh`
+6. **Theme-Scoped & App-Aware CRT Phosphor Glow Shader (`shaders/crt-scanlines.glsl`)** — Hyprland `decoration.screen_shader` installed to `~/.config/hypr/shaders/crt-scanlines.glsl` and managed dynamically by `~/.local/bin/arasaka-crt-watch` (`arasaka-crt-watch.service` + `theme-set.d/arasaka-crt-sync.sh`):
+   - Tuned two-ring 16-tap warm amber/crimson phosphor bloom, subtle horizontal CRT scanlines (~8% modulation), and light edge vignette
+   - **Theme-scoped**: activates only when `arasaka-corp` is the active Omarchy theme and clears automatically on other themes
+   - **App-aware**: active on empty workspaces (desktop, Omarchy bar, OmaWidgets, menus) and Omarchy shell/TUI/terminal windows (`org.omarchy.*`, `TUI.*`, `quickshell`, Ghostty/Alacritty/Foot/Kitty); automatically disables whenever Chromium or other third-party apps are visible on the active workspace
+   - To disable later, run `systemctl --user disable --now arasaka-crt-watch.service` or `./uninstall.sh`
 
 ## Prerequisites
 

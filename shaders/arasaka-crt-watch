@@ -1,0 +1,217 @@
+#!/usr/bin/env python3
+"""Theme-aware and app-aware Hyprland CRT shader watcher for Arasaka Corp.
+
+Enables the Arasaka CRT phosphor glow shader ONLY when:
+  1. The active Omarchy theme is `arasaka-corp`, AND
+  2. Every visible window on the active workspace is an Omarchy shell/TUI/terminal
+     app (or the workspace is empty, showing only desktop/bar/widgets).
+
+Whenever Chromium or any other third-party app is visible on the active workspace,
+or when switching away from `arasaka-corp`, `decoration:screen_shader` is cleared
+to `[[EMPTY]]`.
+"""
+
+import json
+import os
+import re
+import signal
+import socket
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+HOME = Path.home()
+STATE_HOME = Path(os.environ.get("XDG_STATE_HOME") or (HOME / ".local" / "state"))
+CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME") or (HOME / ".config"))
+
+THEME_NAME_PATH = STATE_HOME / "omarchy" / "current" / "theme.name"
+SHADER_PATH = CONFIG_HOME / "hypr" / "shaders" / "crt-scanlines.glsl"
+TARGET_THEME = "arasaka-corp"
+
+# Only allow Omarchy shell/TUI apps and native terminals.
+# Empty workspace (desktop + Omarchy bar/widgets/menus) is always allowed.
+ALLOWED_CLASS_PATTERNS = [
+    re.compile(r"^org\.omarchy\.", re.IGNORECASE),
+    re.compile(r"^com\.omarchy\.", re.IGNORECASE),
+    re.compile(r"^omarchy", re.IGNORECASE),
+    re.compile(r"^tui\.", re.IGNORECASE),
+    re.compile(r"^quickshell$", re.IGNORECASE),
+    re.compile(r"^com\.mitchellh\.ghostty$", re.IGNORECASE),
+    re.compile(r"^alacritty$", re.IGNORECASE),
+    re.compile(r"^foot$", re.IGNORECASE),
+    re.compile(r"^kitty$", re.IGNORECASE),
+]
+
+WATCH_EVENTS = (
+    "workspace>>",
+    "workspacev2>>",
+    "focusedmon>>",
+    "focusedmonv2>>",
+    "activewindow>>",
+    "activewindowv2>>",
+    "openwindow>>",
+    "closewindow>>",
+    "movewindow>>",
+    "movewindowv2>>",
+    "fullscreen>>",
+    "configreloaded>>",
+    "activespecial>>",
+)
+
+_last_applied = None
+_force_recheck = False
+
+
+def is_allowed_class(win_class: str) -> bool:
+    if not win_class:
+        return True
+    return any(p.search(win_class) for p in ALLOWED_CLASS_PATTERNS)
+
+
+def current_theme() -> str:
+    try:
+        return THEME_NAME_PATH.read_text(encoding="utf-8").strip().lower()
+    except OSError:
+        return ""
+
+
+def hyprctl_json(cmd: str):
+    try:
+        out = subprocess.check_output(
+            ["hyprctl", cmd, "-j"], stderr=subprocess.DEVNULL, text=True, timeout=2
+        )
+        return json.loads(out)
+    except Exception:
+        return None
+
+
+def current_screen_shader() -> str:
+    try:
+        out = subprocess.check_output(
+            ["hyprctl", "getoption", "decoration:screen_shader", "-j"],
+            stderr=subprocess.DEVNULL,
+            text=True,
+            timeout=2,
+        )
+        return json.loads(out).get("str", "[[EMPTY]]")
+    except Exception:
+        return "[[EMPTY]]"
+
+
+def compute_desired_shader() -> str:
+    if current_theme() != TARGET_THEME or not SHADER_PATH.is_file():
+        return "[[EMPTY]]"
+
+    ws = hyprctl_json("activeworkspace")
+    clients = hyprctl_json("clients")
+    if not isinstance(ws, dict) or not isinstance(clients, list):
+        return "[[EMPTY]]"
+
+    ws_id = ws.get("id")
+    for client in clients:
+        if not client.get("mapped", False) or client.get("hidden", False):
+            continue
+        c_ws = client.get("workspace", {})
+        if c_ws.get("id") != ws_id:
+            continue
+        win_class = client.get("class") or client.get("initialClass") or ""
+        if not is_allowed_class(win_class):
+            return "[[EMPTY]]"
+
+    return str(SHADER_PATH)
+
+
+def sync_shader(force: bool = False) -> None:
+    global _last_applied
+    desired = compute_desired_shader()
+    if not force and desired == _last_applied:
+        return
+    actual = current_screen_shader()
+    if actual != desired:
+        lua_expr = f"hl.config({{ decoration = {{ screen_shader = {json.dumps(desired)} }} }})"
+        res = subprocess.run(
+            ["hyprctl", "eval", lua_expr],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=2,
+        )
+        if res.returncode != 0:
+            return
+    _last_applied = desired
+
+
+def find_socket2() -> Path | None:
+    runtime = Path(os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}")
+    hypr_dir = runtime / "hypr"
+    sig = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")
+    if sig:
+        sock = hypr_dir / sig / ".socket2.sock"
+        if sock.exists():
+            return sock
+    if hypr_dir.is_dir():
+        candidates = sorted(
+            hypr_dir.glob("*/.socket2.sock"),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        if candidates:
+            return candidates[0]
+    return None
+
+
+def handle_sigusr1(_signum, _frame):
+    global _force_recheck
+    _force_recheck = True
+
+
+def main() -> int:
+    global _force_recheck
+    signal.signal(signal.SIGUSR1, handle_sigusr1)
+
+    sync_shader(force=True)
+
+    while True:
+        sock_path = find_socket2()
+        if not sock_path:
+            time.sleep(2)
+            continue
+
+        try:
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+                sock.connect(str(sock_path))
+                sock.settimeout(1.0)
+                buf = ""
+                sync_shader(force=True)
+                while True:
+                    if _force_recheck:
+                        _force_recheck = False
+                        sync_shader(force=True)
+                    try:
+                        chunk = sock.recv(4096)
+                    except socket.timeout:
+                        continue
+                    except InterruptedError:
+                        continue
+                    if not chunk:
+                        break
+                    buf += chunk.decode("utf-8", errors="ignore")
+                    should_sync = False
+                    force_sync = False
+                    while "\n" in buf:
+                        line, buf = buf.split("\n", 1)
+                        if line.startswith("configreloaded>>"):
+                            should_sync = True
+                            force_sync = True
+                        elif line.startswith(WATCH_EVENTS):
+                            should_sync = True
+                    if should_sync:
+                        sync_shader(force=force_sync)
+        except OSError:
+            time.sleep(1)
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
