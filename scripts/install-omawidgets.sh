@@ -37,7 +37,7 @@ if [[ ! -d "${DEST_DIR}" ]]; then
 fi
 
 # 2. Apply Arasaka HUD card files & vector assets
-echo "Applying Arasaka Corp HUD styling (Performance, Battery, Power profile)..."
+echo "Applying Arasaka Corp HUD styling (Performance, Battery, Power profile, Now Playing)..."
 mkdir -p "${DEST_DIR}/assets" "${DEST_DIR}/cards" "${DEST_DIR}/ui"
 cp "${SRC_DIR}/assets/"* "${DEST_DIR}/assets/"
 cp "${SRC_DIR}/cards/"* "${DEST_DIR}/cards/"
